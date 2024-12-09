@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flanker Fish Experiment</title>
+    <!-- 引入必要的库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* 基础样式 */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 调整容器样式 */
+        /* 调整容器样式 */
+        .container {
+            width: 100vmin; /* 使用vmin单位确保正方形效果 */
+            height: 100vmin;
+            max-width: 700px; /* 设置最大宽度 */
+            max-height: 500px; /* 设置最大高度 */
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden; /* 防止内容溢出 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 调整用户表单样式 */
+        #userForm {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        #userForm h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        
+
+        /* 表单样式 */
+        .form-group {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group label {
+            width: 120px;
+            text-align: right;
+            margin-right: 15px;
+            color: #34495e;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 250px;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52,152,219,0.3);
+            outline: none;
+        }
+
+        #participantForm button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #participantForm button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+
+        /* 加载屏幕 */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .progress-container {
+            width: 80%;
+            max-width: 300px;
+        }
+
+        /* 调整刺激物图片大小 */
+        .stimulus {
+            max-width: 100%;
+            max-height: 90%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }   
+
+        .fixation {
+            font-size: 48px;
+            color: red;
+            height: 60px;
+            line-height: 60px;
+            position: absolute;  /* 新添加 */
+            left: 50%;          /* 新添加 */
+            top: 50%;           /* 新添加 */
+            transform: translate(-50%, -50%);  /* 新添加 */
+            z-index: 2;         /* 新添加 */
+        }
+
+        /* 图形响应按钮 */
+        .button-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: calc(50% + 200px); /* 调整这个值可以改变按钮与图片的距离 */
+            display: flex;
+            justify-content: center;
+            gap: 100px; /* 按钮之间的间距 */
+            width: 100%;
+        }
+
+        /* 修改按钮图片样式 */
+        .response-button {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            user-select: none;           /* 防止文本选择 */
+            -webkit-user-drag: none;     /* Safari */
+            -khtml-user-drag: none;      /* Konqueror HTML */
+            -moz-user-drag: none;        /* Firefox */
+            -o-user-drag: none;          /* Old versions of Opera */
+            user-drag: none;             /* 标准语法 */
+            pointer-events: all;         /* 确保点击事件仍然有效 */
+        }
+
+        .response-button:hover {
+            transform: scale(1.1);
+        }
+
+        .response-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 结果显示 */
+        .results-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        .results-table td, 
+        .results-table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .export-buttons button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #feedback {
+            font-size: 24px;
+            margin: 20px;
+            min-height: 30px;
+        }
+
+        /* 调整实验屏幕样式 */
+        #experimentScreen {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+
+        /* 调整指导语屏幕 */
+        #instructionScreen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 调整结果容器 */
+        #resultsContainer {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 用户信息表单 -->
+    <div id="userForm" class="container">
+        <h2>实验信息采集</h2>
+        <form id="participantForm">
+            <div class="form-group">
+                <label>姓名：</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label>性别：</label>
+                <select id="gender" required>
+                    <option value="">请选择</option>
+                    <option value="male">男</option>
+                    <option value="female">女</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>出生日期：</label>
+                <input type="date" id="birthDate" required>
+            </div>
+            <div class="form-group">
+                <label>幼儿园：</label>
+                <input type="text" id="kindergarten" required>
+            </div>
+            <div class="form-group">
+                <label>班级：</label>
+                <input type="text" id="class" required>
+            </div>
+            <button type="submit">开始实验</button>
+        </form>
+    </div>
+
+    <!-- 加载界面 -->
+    <div id="loadingScreen" class="loading-screen" style="display: none;">
+        <h2>正在加载实验资源...</h2>
+        <div class="progress-container">
+            <div id="imageLoadStatus"></div>
+        </div>
+    </div>
+
+    <!-- 实验界面 -->
+    <div id="experimentContainer" class="container" style="display: none;">
+        <!-- 指导语 -->
+        <div id="instructionScreen">
+            <h2>实验说明</h2>
+            <img id="instructionImage" src="./image/instruction.png" style="max-width: 100%;">
+            <button onclick="startPractice()" class="start-button">开始练习</button>
+        </div>
+
+        <!-- 实验屏幕 -->
+        <div id="experimentScreen" style="display: none;">
+            <div id="fixation" class="fixation">+</div>
+            <img id="stimulusImage" class="stimulus">
+            <div class="button-container">
+                <img src="./image/左.png" class="response-button" onclick="experiment.respond('left')" alt="左箭头">
+                <img src="./image/右.png" class="response-button" onclick="experiment.respond('right')" alt="右箭头">
+            </div>
+            <div id="feedback"></div>
+        </div>
+
+        <!-- 结果显示 -->
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <h2>实验结果</h2>
+            <div id="results-display"></div>
+            <div class="export-buttons">
+                <button onclick="experiment.exportToExcel()">导出Excel</button>
+                <button onclick="experiment.copyResults()">复制结果</button>
+                <button onclick="experiment.toggleResults()">显示/隐藏详细结果</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class FlankerExperiment {
+            constructor() {
+                this.CONFIG = {
+                    fixationDuration: 600,
+                    stimulusDuration: 1700,    // 最长反应时间
+                    feedbackDuration: 1500,    // 练习阶段反馈时间
+                    practiceTrialsRequired: 6,  // 需要的正确练习次数
+                    maxPracticeAttempts: 2,    // 最大练习尝试次数
+                    practiceTrials: 8,         // 练习总试次
+                    formalTrials: 32,          // 正式实验试次
+                    correctResponses: {         // 正确的按键映射
+                        '11': 'left',
+                        '12': 'right',
+                        '21': 'left',
+                        '22': 'right'
+                    }
+                };
+            
+                this.state = {
+                    phase: 'practice',         // practice 或 formal
+                    practiceAttempts: 0,       // 练习尝试次数
+                    correctResponses: 0,       // 正确反应数
+                    currentTrial: 0,           // 当前试次
+                    trialStart: 0,            // 试次开始时间
+                    responded: false,          // 是否已响应
+                    currentStimulus: null,     // 当前刺激图片编号
+                    practiceSequence: [],      // 练习序列
+                    formalSequence: []         // 正式实验序列
+                };
+            
+                this.participantInfo = {};
+                this.experimentData = {
+                    trials: [],
+                    startTime: 0,
+                    finalScore: 0
+                };
+            
+                // 预加载的图片
+                this.imagesToPreload = [
+                    // 练习阶段反馈用图片
+                    './image/111.png',  // 正确反馈
+                    './image/121.png',
+                    './image/211.png',
+                    './image/221.png',
+                    './image/112.png',  // 错误反馈
+                    './image/122.png',
+                    './image/212.png',
+                    './image/222.png',
+                    // 实验用图片
+                    './image/11.png',
+                    './image/12.png',
+                    './image/21.png',
+                    './image/22.png'
+                ];
+            
+                // 初始化键盘事件监听
+                this.initializeKeyboardListeners();
+            }
+
+            //添加键盘监听初始化函数   
+            initializeKeyboardListeners() {
+                document.addEventListener('keydown', (event) => {
+                    if (!this.state.responded) {
+                        if (event.key.toLowerCase() === 'a') {
+                            this.respond('left');
+                        } else if (event.key.toLowerCase() === 'l') {
+                            this.respond('right');
+                        }
+                    }
+                });
+            }
+            
+            //添加生成实验序列函数            
+            generateSequence(type) {
+                let sequence = [];
+                const stimuli = ['11', '12', '21', '22'];
+                const repetitions = type === 'practice' ? 2 : 8; // 练习2次，正式8次
+            
+                // 为每个刺激生成指定重复次数
+                stimuli.forEach(stimulus => {
+                    for (let i = 0; i < repetitions; i++) {
+                        sequence.push(stimulus);
+                    }
+                });
+            
+                // Fisher-Yates 随机打乱算法
+                for (let i = sequence.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
+                }
+            
+                return sequence;
+            }
+
+            initialize() {
+                const form = document.getElementById('participantForm');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.startExperiment();
+                });
+            }
+
+            // 修改实验开始方法
+            async startExperiment() {
+                try {
+                    if (!this.validateParticipantInfo()) {
+                        alert('请填写所有信息');
+                        return;
+                    }
+
+                    this.collectParticipantInfo();
+                    await this.preloadImages();
+                    this.showExperiment();
+                } catch (error) {
+                    console.error('Error starting experiment:', error);
+                    alert('实验启动失败：' + error.message);
+                }
+            }
+
+            // 添加表单验证方法
+            validateParticipantInfo() {
+                const name = document.getElementById('name').value;
+                const gender = document.getElementById('gender').value;
+                const birthDate = document.getElementById('birthDate').value;
+                const kindergarten = document.getElementById('kindergarten').value;
+                const className = document.getElementById('class').value;
+
+                return name && gender && birthDate && kindergarten && className;
+            }
+        
+
+            collectParticipantInfo() {
+                this.participantInfo = {
+                    name: document.getElementById('name').value,
+                    gender: document.getElementById('gender').value,
+                    birthDate: document.getElementById('birthDate').value,
+                    kindergarten: document.getElementById('kindergarten').value,
+                    className: document.getElementById('class').value
+                };
+            }
+
+            async preloadImages() {
+                document.getElementById('userForm').style.display = 'none';
+                document.getElementById('loadingScreen').style.display = 'flex';
+                
+                const statusDiv = document.getElementById('imageLoadStatus');
+                let loadedCount = 0;
+
+                try {
+                    await Promise.all(this.imagesToPreload.map(src => {
+                        return new Promise((resolve, reject) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                loadedCount++;
+                                statusDiv.innerHTML = `加载进度: ${loadedCount}/${this.imagesToPreload.length}`;
+                                resolve();
+                            };
+                            img.onerror = () => reject(`Failed to load ${src}`);
+                            img.src = src;
+                        });
+                    }));
+                } catch (error) {
+                    throw new Error('图片加载失败');
+                }
+            }
+
+            showExperiment() {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('experimentContainer').style.display = 'block';
+                this.experimentData.startTime = Date.now();
+            }
+
+            startPractice() {
+                document.getElementById('instructionScreen').style.display = 'none';
+                document.getElementById('experimentScreen').style.display = 'block';
+                
+                // 重置状态
+                this.state.phase = 'practice';
+                this.state.currentTrial = 0;
+                this.state.correctResponses = 0;
+                this.state.practiceSequence = this.generateSequence('practice');
+                
+                this.runTrial();
+            }
+
+            // 运行试次
+            runTrial() {
+                // 清理之前的定时器
+                if (this.timeouts) {
+                    this.timeouts.forEach(timeout => clearTimeout(timeout));
+                }
+                this.timeouts = [];
+                
+                this.state.responded = false;
+                this.state.trialStart = 0;
+                
+                const fixation = document.getElementById('fixation');
+                const stimulus = document.getElementById('stimulusImage');
+                const feedback = document.getElementById('feedback');
+                const buttonContainer = document.querySelector('.button-container'); // 新添加
+                
+                // 清除之前的显示状态
+                feedback.textContent = '';
+                stimulus.style.display = 'none';
+                fixation.style.display = 'none';
+                buttonContainer.style.display = 'none'; // 新添加：隐藏按钮
+                
+                // 显示注视点
+                fixation.style.display = 'block';
+                
+                // 注视点呈现后显示刺激
+                this.timeouts.push(setTimeout(() => {
+                    fixation.style.display = 'none';
+                    stimulus.style.display = 'block';
+                    buttonContainer.style.display = 'flex'; // 新添加：显示按钮
+                    
+                    // 获取当前试次的刺激
+                    const sequence = this.state.phase === 'practice' 
+                        ? this.state.practiceSequence 
+                        : this.state.formalSequence;
+                    this.state.currentStimulus = sequence[this.state.currentTrial];
+                    
+                    // 设置刺激图片并记录开始时间
+                    stimulus.src = `./image/${this.state.currentStimulus}.png`;
+                    this.state.trialStart = Date.now();
+                    
+                    // 设置反应超时
+                    this.timeouts.push(setTimeout(() => {
+                        if (!this.state.responded) {
+                            this.handleNoResponse();
+                        }
+                    }, this.CONFIG.stimulusDuration));
+                    
+                }, this.CONFIG.fixationDuration));
+            }
+
+            // 处理无反应情况
+            handleNoResponse() {
+                if (this.state.responded) return;
+                
+                this.state.responded = true;
+                
+                // 隐藏刺激
+                const stimulus = document.getElementById('stimulusImage');
+                stimulus.style.display = 'none';
+                
+                // 记录数据
+                this.recordTrialData({
+                    stimulusType: this.state.currentStimulus,
+                    response: 'none',
+                    keyPressed: 'None',
+                    responseType: 'NoResponse',
+                    reactionTime: this.CONFIG.stimulusDuration
+                });
+                
+                if (this.state.phase === 'practice') {
+                    const feedback = document.getElementById('feedback');
+                    feedback.textContent = '请及时反应!';
+                    feedback.style.color = 'red';
+                    
+                    setTimeout(() => {
+                        this.nextTrial();
+                    }, this.CONFIG.feedbackDuration);
+                } else {
+                    this.nextTrial();
+                }
+            }
+
+            getRandomStimulus() {
+                if (this.state.phase === 'practice') {
+                    // 练习阶段的图片
+                    const correctStimuli = ['111.png', '121.png', '211.png', '221.png'];
+                    const incorrectStimuli = ['112.png', '122.png', '212.png', '222.png'];
+                    // 根据上一次反应的正确性选择对应的反馈图片
+                    const stimuli = this.state.lastResponseCorrect ? correctStimuli : incorrectStimuli;
+                    return './image/' + stimuli[Math.floor(Math.random() * stimuli.length)];
+                } else {
+                    // 正式实验的图片
+                    const stimuli = ['11.png', '12.png', '21.png', '22.png'];
+                    return './image/' + stimuli[Math.floor(Math.random() * stimuli.length)];
+                }
+            }
+
+            checkResponse(direction) {
+                const correctResponse = this.CONFIG.correctResponses[this.state.currentStimulus];
+                return direction === correctResponse;
+            }
+
+            respond(direction) {
+                if (this.state.responded || !this.state.trialStart) return;
+                
+                const reactionTime = Date.now() - this.state.trialStart;
+                if (reactionTime < 100) return; // 忽略过快的反应
+                
+                this.state.responded = true;
+                const correct = this.checkResponse(direction);
+                
+                // 隐藏刺激
+                const stimulus = document.getElementById('stimulusImage');
+                stimulus.style.display = 'none';
+                
+                // 记录数据
+                this.recordTrialData({
+                    stimulusType: this.state.currentStimulus,
+                    response: direction,
+                    keyPressed: direction === 'left' ? 'A' : 'L',
+                    responseType: correct ? 'Correct' : 'False',
+                    reactionTime: reactionTime
+                });
+                
+                if (this.state.phase === 'practice') {
+                    this.showFeedback(correct);
+                } else {
+                    this.nextTrial();
+                }
+            }
+
+            recordTrialData(data) {
+                const trial = {
+                    phase: this.state.phase,
+                    trial: this.state.currentTrial + 1,
+                    stimulusType: data.stimulusType,
+                    response: data.response,
+                    keyPressed: data.keyPressed,
+                    responseType: data.responseType,
+                    correct: data.responseType === 'Correct', // 添加正确性记录
+                    reactionTime: data.reactionTime,
+                    timestamp: new Date().toISOString()
+                };
+            
+                this.experimentData.trials.push(trial);
+            }
+
+            // 显示反馈（仅在练习阶段）
+            showFeedback(correct) {
+                const feedback = document.getElementById('feedback');
+                const stimulus = document.getElementById('stimulusImage');
+                const buttonContainer = document.querySelector('.button-container'); // 新添加
+                
+                // 隐藏按钮
+                buttonContainer.style.display = 'none'; // 新添加
+                
+                // 设置反馈文字
+                feedback.textContent = correct ? '正确!' : '错误!';
+                feedback.style.color = correct ? 'green' : 'red';
+                
+                // 显示反馈图片
+                stimulus.style.display = 'block';
+                const currentStim = this.state.currentStimulus;
+                const feedbackImage = correct ? 
+                    `${currentStim}1.png` : 
+                    `${currentStim}2.png`;
+                stimulus.src = `./image/${feedbackImage}`;
+                
+                if (correct) {
+                    this.state.correctResponses++;
+                }
+                
+                setTimeout(() => {
+                    this.nextTrial();
+                }, this.CONFIG.feedbackDuration);
+            }
+            
+            cleanup() {
+                // 清理所有定时器
+                if (this.timeouts) {
+                    this.timeouts.forEach(timeout => clearTimeout(timeout));
+                }
+                this.timeouts = [];
+                
+                // 重置显示状态
+                const fixation = document.getElementById('fixation');
+                const stimulus = document.getElementById('stimulusImage');
+                const feedback = document.getElementById('feedback');
+                const buttonContainer = document.querySelector('.button-container'); // 新添加
+                
+                fixation.style.display = 'none';
+                stimulus.style.display = 'none';
+                feedback.textContent = '';
+                buttonContainer.style.display = 'none'; // 新添加
+            }
+
+            nextTrial() {
+                this.cleanup(); // 清理当前试次
+                this.state.currentTrial++;
+                
+                if (this.state.phase === 'practice') {
+                    this.checkPracticeProgress();
+                } else if (this.state.currentTrial >= this.CONFIG.formalTrials) {
+                    this.endExperiment();
+                } else {
+                    this.runTrial(); // 直接运行下一个试次，注视点会作为间隔
+                }
+            }
+
+            checkPracticeProgress() {
+                const completedAllTrials = this.state.currentTrial >= this.CONFIG.practiceTrials;
+                
+                if (completedAllTrials) {
+                    if (this.state.correctResponses >= this.CONFIG.practiceTrialsRequired) {
+                        this.startFormalExperiment();
+                    } else if (this.state.practiceAttempts >= this.CONFIG.maxPracticeAttempts - 1) {
+                        this.endExperiment();
+                    } else {
+                        this.state.practiceAttempts++;
+                        alert('练习未通过，请重新开始练习');
+                        document.getElementById('experimentScreen').style.display = 'none';
+                        document.getElementById('instructionScreen').style.display = 'block';
+                    }
+                } else {
+                    this.runTrial();
+                }
+            }
+
+            startFormalExperiment() {
+                this.state.phase = 'formal';
+                this.state.currentTrial = 0;
+                this.state.formalSequence = this.generateSequence('formal');
+                alert('练习完成，按确定开始正式实验');
+                this.runTrial();
+            }
+
+            endExperiment() {
+                document.getElementById('experimentScreen').style.display = 'none';
+                document.getElementById('resultsContainer').style.display = 'block';
+                this.calculateResults();
+                this.displayResults();
+            }
+
+            calculateResults() {
+                const formalTrials = this.experimentData.trials.filter(t => t.phase === 'formal');
+                this.experimentData.finalScore = Math.round(
+                    (formalTrials.filter(t => t.correct).length / formalTrials.length) * 100
+                );
+            }
+
+            formatResults() {
+                let result = '';
+                
+                // 1. 参与者信息表
+                result += '参与者信息表\n';
+                result += '姓名,性别,出生日期,幼儿园,班级\n';
+                result += `${this.participantInfo.name},${this.participantInfo.gender === 'male' ? '男' : '女'},${this.participantInfo.birthDate},${this.participantInfo.kindergarten},${this.participantInfo.className}\n\n`;
+                
+                // 2. 试次数据表
+                result += '试次数据表\n';
+                result += '阶段,试次,反应,是否正确,反应时间(ms),时间戳\n';
+                this.experimentData.trials.forEach(trial => {
+                    result += `${trial.phase},`;
+                    result += `${trial.trial},`;
+                    result += `${trial.response},`;
+                    result += `${trial.correct ? '正确' : '错误'},`;
+                    result += `${trial.reactionTime},`;
+                    result += `${trial.timestamp}\n`;
+                });
+                result += '\n';
+                
+                // 3. 汇总数据
+                result += '汇总数据表\n';
+                result += '最终得分,总用时(秒),总试次数,正确试次数,平均反应时间(ms)\n';
+                const totalTime = Math.round((Date.now() - this.experimentData.startTime) / 1000);
+                const correctTrials = this.experimentData.trials.filter(t => t.correct).length;
+                const avgRT = Math.round(this.experimentData.trials.reduce((sum, t) => sum + t.reactionTime, 0) / this.experimentData.trials.length);
+                result += `${this.experimentData.finalScore},${totalTime},${this.experimentData.trials.length},${correctTrials},${avgRT}\n`;
+                
+                return result;
+            }
+
+            async copyResults() {
+                try {
+                    const text = this.formatResults();
+                    await navigator.clipboard.writeText(text);
+                    alert('结果已复制到剪贴板！');
+                } catch (err) {
+                    alert('复制失败: ' + err.message);
+                    console.error('复制错误:', err);
+                }
+            }
+
+            toggleResults() {
+                const resultsDisplay = document.getElementById('results-display');
+                if (resultsDisplay.style.display === 'none') {
+                    const lines = this.formatResults().split('\n');
+                    let htmlContent = '';
+                    let currentTable = '';
+                    
+                    lines.forEach(line => {
+                        if (line.trim() === '') {
+                            if (currentTable) {
+                                htmlContent += currentTable + '</table><br>';
+                                currentTable = '';
+                            }
+                        } else if (line.endsWith('表')) {
+                            if (currentTable) {
+                                htmlContent += currentTable + '</table><br>';
+                            }
+                            htmlContent += `<h3>${line}</h3>`;
+                            currentTable = '<table class="results-table">';
+                        } else {
+                            const cells = line.split(',');
+                            currentTable += '<tr>' + cells.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+                        }
+                    });
+                    
+                    if (currentTable) {
+                        htmlContent += currentTable + '</table>';
+                    }
+                    
+                    resultsDisplay.innerHTML = htmlContent;
+                    resultsDisplay.style.display = 'block';
+                } else {
+                    resultsDisplay.style.display = 'none';
+                }
+            }
+
+            exportToExcel() {
+                try {
+                    const wb = XLSX.utils.book_new();
+                    
+                    // 1. 参与者信息
+                    const participantData = [{
+                        姓名: this.participantInfo.name,
+                        性别: this.participantInfo.gender === 'male' ? '男' : '女',
+                        出生日期: this.participantInfo.birthDate,
+                        幼儿园: this.participantInfo.kindergarten,
+                        班级: this.participantInfo.className
+                    }];
+                    const wsParticipant = XLSX.utils.json_to_sheet(participantData);
+                    XLSX.utils.book_append_sheet(wb, wsParticipant, "参与者信息");
+                    
+                    // 2. 试次数据
+                    const trialData = this.experimentData.trials.map(trial => ({
+                        阶段: trial.phase,
+                        试次: trial.trial,
+                        反应: trial.response,
+                        是否正确: trial.correct ? '正确' : '错误',
+                        反应时间: trial.reactionTime,
+                        时间戳: trial.timestamp
+                    }));
+                    const wsTrials = XLSX.utils.json_to_sheet(trialData);
+                    XLSX.utils.book_append_sheet(wb, wsTrials, "试次数据");
+                    
+                    // 3. 汇总数据
+                    const summaryData = [{
+                        最终得分: this.experimentData.finalScore,
+                        总用时: Math.round((Date.now() - this.experimentData.startTime) / 1000),
+                        总试次数: this.experimentData.trials.length,
+                        正确试次数: this.experimentData.trials.filter(t => t.correct).length,
+                        平均反应时间: Math.round(this.experimentData.trials.reduce((sum, t) => 
+                            sum + t.reactionTime, 0) / this.experimentData.trials.length)
+                    }];
+                    const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+                    XLSX.utils.book_append_sheet(wb, wsSummary, "汇总数据");
+                    
+                    // 生成文件名并保存
+                    const fileName = `Flanker实验_${this.participantInfo.name}_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+                    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                    saveAs(new Blob([wbout], { type: 'application/octet-stream' }), fileName);
+                    
+                } catch (error) {
+                    alert('导出失败: ' + error.message);
+                    console.error('导出错误:', error);
+                }
+            }
+        }
+
+        // 创建实验实例
+        document.addEventListener('DOMContentLoaded', () => {
+            window.experiment = new FlankerExperiment();
+            window.experiment.initialize();
+        });
+        // 公共函数
+        function startPractice() {
+            window.experiment.startPractice();
+        }
+    </script>
+</body>
+</html>
