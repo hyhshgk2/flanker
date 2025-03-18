@@ -20,12 +20,11 @@
         }
 
         /* 调整容器样式 */
-        /* 调整容器样式 */
         .container {
-            width: 100vmin; /* 使用vmin单位确保正方形效果 */
-            height: 100vmin;
-            max-width: 700px; /* 设置最大宽度 */
-            max-height: 500px; /* 设置最大高度 */
+            width: 120vmin; /* 放大20% */
+            height: 120vmin;
+            max-width: 840px; /* 700px * 1.2 */
+            max-height: 600px; /* 500px * 1.2 */
             margin: 20px auto;
             padding: 20px;
             background: #fff;
@@ -132,8 +131,10 @@
 
         /* 调整刺激物图片大小 */
         .stimulus {
-            max-width: 100%;
-            max-height: 90%;
+            width: 140%;  /* 放大20% */
+            height: 120%;
+            max-width: none;  /* 移除原有限制 */
+            max-height: none;
             position: absolute;
             left: 50%;
             top: 50%;
@@ -141,7 +142,7 @@
         }   
 
         .fixation {
-            font-size: 48px;
+            font-size: 58px; /* 48px * 1.2 */
             color: red;
             height: 60px;
             line-height: 60px;
@@ -152,31 +153,30 @@
             z-index: 2;         /* 新添加 */
         }
 
-        /* 图形响应按钮 */
+        /* 修改按钮容器样式 */
         .button-container {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: calc(50% + 200px); /* 调整这个值可以改变按钮与图片的距离 */
+            top: calc(50% + 240px); /* 原200px * 1.2 */
             display: flex;
             justify-content: center;
-            gap: 100px; /* 按钮之间的间距 */
+            gap: 200px; /* 增加按钮间距从100px到150px */
             width: 100%;
         }
 
         /* 修改按钮图片样式 */
         .response-button {
-            width: 40px;
-            height: 40px;
+            width: 72px;  /* 60px * 1.2 */
+            height: 48px; /* 40px * 1.2 */
             cursor: pointer;
             transition: transform 0.2s;
-            user-select: none;           /* 防止文本选择 */
-            -webkit-user-drag: none;     /* Safari */
-            -khtml-user-drag: none;      /* Konqueror HTML */
-            -moz-user-drag: none;        /* Firefox */
-            -o-user-drag: none;          /* Old versions of Opera */
-            user-drag: none;             /* 标准语法 */
-            pointer-events: all;         /* 确保点击事件仍然有效 */
+            user-select: none;
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            pointer-events: all;
         }
 
         .response-button:hover {
@@ -235,14 +235,112 @@
         }
         
 
-        /* 调整指导语屏幕 */
-        #instructionScreen {
+        /* 添加指导语轮播样式 */
+        .instruction-carousel {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+        }
+
+        .instruction-slide {
+            text-align: center;
+            display: none;
+        }
+
+        .instruction-slide.active {
+            display: block;
+        }
+
+        .instruction-image {
+            max-width: 90%;
+            max-height: 60%;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .instruction-text {
+            margin: 15px 0;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .carousel-nav button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-nav button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #bbb;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #3498db;
+        }
+
+        /* 美化开始按钮 */
+        .start-button {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .start-button:hover {
+            background: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+        }
+
+        /* 美化反馈显示 */
+        #feedback {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px;
+            min-height: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
         /* 调整结果容器 */
@@ -299,9 +397,65 @@
     <div id="experimentContainer" class="container" style="display: none;">
         <!-- 指导语 -->
         <div id="instructionScreen">
-            <h2>实验说明</h2>
-            <img id="instructionImage" src="./image/instruction.png" style="max-width: 100%;">
-            <button onclick="startPractice()" class="start-button">开始练习</button>
+            <div class="instruction-carousel">
+                <div class="instruction-slide active" data-slide="1" data-correct-key="a" data-correct-dir="left">
+                    <h2>实验说明 (1/4)</h2>
+                    <p class="instruction-text">如果中间的小鱼向左，请按左箭头键(A)；如果向右，请按右箭头键(L)。</p>
+                    <img src="./image/1111.png" class="instruction-image">
+                </div>
+                <div class="instruction-slide" data-slide="2" data-correct-key="l" data-correct-dir="right">
+                    <h2>实验说明 (2/4)</h2>
+                    <p class="instruction-text">如果中间的小鱼向左，请按左箭头键(A)；如果向右，请按右箭头键(L)。</p>
+                    <img src="./image/2222.png" class="instruction-image">
+                </div>
+                <div class="instruction-slide" data-slide="3" data-correct-key="a" data-correct-dir="left">
+                    <h2>实验说明 (3/4)</h2>
+                    <p class="instruction-text">如果中间的小鱼向左，请按左箭头键(A)；如果向右，请按右箭头键(L)。</p>
+                    <img src="./image/3333.png" class="instruction-image">
+                </div>
+                <div class="instruction-slide" data-slide="4" data-correct-key="l" data-correct-dir="right">
+                    <h2>实验说明 (4/4)</h2>
+                    <p class="instruction-text">如果中间的小鱼向左，请按左箭头键(A)；如果向右，请按右箭头键(L)。</p>
+                    <img src="./image/4444.png" class="instruction-image">
+                </div>
+                
+                <div class="carousel-dots">
+                    <span class="dot active" data-slide="1"></span>
+                    <span class="dot" data-slide="2"></span>
+                    <span class="dot" data-slide="3"></span>
+                    <span class="dot" data-slide="4"></span>
+                </div>
+                
+                <div class="button-container instruction-buttons">
+                    <img src="./image/左.png" class="response-button" id="instruction-left-btn" alt="左箭头">
+                    <img src="./image/右.png" class="response-button" id="instruction-right-btn" alt="右箭头">
+                </div>
+                
+                <button onclick="startPractice()" class="start-button" style="display: none;">开始练习</button>
+                
+                <!-- 添加练习前说明页面 -->
+                <div id="practiceIntroScreen" style="display: none; text-align: center;">
+                    <h2>练习环节说明</h2>
+                    <p class="instruction-text">接下来是练习环节，你将有机会熟悉实验流程。</p>
+                    <p class="instruction-text">请记住：关注中间的小鱼，判断它的方向。</p>
+                    <p class="instruction-text">如果中间的小鱼向左，请按A键或点击左箭头；如果向右，请按L键或点击右箭头。</p>
+                    <p class="instruction-text">你需要完成至少6次正确反应才能进入正式实验。</p>
+                    <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                        <button onclick="startActualPractice()" class="start-button">开始练习</button>
+                        <button onclick="returnToInstructions()" class="start-button" style="background: #95a5a6;">返回说明</button>
+                    </div>
+                </div>
+                
+                <!-- 添加正式实验前说明页面 -->
+                <div id="formalIntroScreen" style="display: none; text-align: center;">
+                    <h2>正式实验说明</h2>
+                    <p class="instruction-text">练习环节已完成，接下来进入正式实验。</p>
+                    <p class="instruction-text">请继续关注中间的小鱼，判断它的方向。</p>
+                    <p class="instruction-text">正式实验中将不再提供反馈。</p>
+                    <p class="instruction-text">请尽量快速准确地做出反应。</p>
+                    <button onclick="startActualExperiment()" class="start-button">开始正式实验</button>
+                </div>
+            </div>
         </div>
 
         <!-- 实验屏幕 -->
@@ -335,7 +489,7 @@
                     stimulusDuration: 1700,    // 最长反应时间
                     feedbackDuration: 1500,    // 练习阶段反馈时间
                     practiceTrialsRequired: 6,  // 需要的正确练习次数
-                    maxPracticeAttempts: 2,    // 最大练习尝试次数
+                    maxPracticeAttempts: 5,    // 最大练习尝试次数，修改为5次
                     practiceTrials: 8,         // 练习总试次
                     formalTrials: 32,          // 正式实验试次
                     correctResponses: {         // 正确的按键映射
@@ -362,7 +516,8 @@
                 this.experimentData = {
                     trials: [],
                     startTime: 0,
-                    finalScore: 0
+                    finalScore: 0,
+                    avgCorrectRT: 0
                 };
             
                 // 预加载的图片
@@ -501,15 +656,25 @@
             }
 
             startPractice() {
+                // 隐藏指导轮播，显示练习前说明
+                document.querySelector('.instruction-carousel > div.active').style.display = 'none';
+                document.querySelector('.carousel-dots').style.display = 'none';
+                document.querySelector('.button-container.instruction-buttons').style.display = 'none';
+                document.querySelector('.start-button').style.display = 'none';
+                document.getElementById('practiceIntroScreen').style.display = 'block';
+            }
+            
+            startActualPractice() {
+                // 隐藏练习前说明，开始实际练习
+                document.getElementById('practiceIntroScreen').style.display = 'none';
                 document.getElementById('instructionScreen').style.display = 'none';
                 document.getElementById('experimentScreen').style.display = 'block';
                 
-                // 重置状态
+                // 调用实验对象的方法启动练习
                 this.state.phase = 'practice';
                 this.state.currentTrial = 0;
                 this.state.correctResponses = 0;
                 this.state.practiceSequence = this.generateSequence('practice');
-                
                 this.runTrial();
             }
 
@@ -730,12 +895,21 @@
                     if (this.state.correctResponses >= this.CONFIG.practiceTrialsRequired) {
                         this.startFormalExperiment();
                     } else if (this.state.practiceAttempts >= this.CONFIG.maxPracticeAttempts - 1) {
-                        this.endExperiment();
-                    } else {
-                        this.state.practiceAttempts++;
-                        alert('练习未通过，请重新开始练习');
+                        // 修改：5次机会都没成功后返回实验说明环节，而不是直接退出
+                        this.state.practiceAttempts = 0;
+                        this.state.correctResponses = 0;
+                        alert('练习未通过，请重新阅读实验说明并再次尝试。');
                         document.getElementById('experimentScreen').style.display = 'none';
                         document.getElementById('instructionScreen').style.display = 'block';
+                        // 重置轮播到第一页
+                        changeSlide(1);
+                    } else {
+                        this.state.practiceAttempts++;
+                        alert(`练习未通过，这是第${this.state.practiceAttempts+1}次尝试，共有5次机会。`);
+                        this.state.currentTrial = 0;
+                        this.state.correctResponses = 0;
+                        this.state.practiceSequence = this.generateSequence('practice');
+                        this.runTrial();
                     }
                 } else {
                     this.runTrial();
@@ -746,8 +920,11 @@
                 this.state.phase = 'formal';
                 this.state.currentTrial = 0;
                 this.state.formalSequence = this.generateSequence('formal');
-                alert('练习完成，按确定开始正式实验');
-                this.runTrial();
+                
+                // 修改为显示正式实验前说明，而不是直接开始
+                document.getElementById('experimentScreen').style.display = 'none';
+                document.getElementById('instructionScreen').style.display = 'block';
+                document.getElementById('formalIntroScreen').style.display = 'block';
             }
 
             
@@ -771,9 +948,18 @@
 
             calculateResults() {
                 const formalTrials = this.experimentData.trials.filter(t => t.phase === 'formal');
+                const correctTrials = formalTrials.filter(t => t.correct);
+                
+                // 计算正确率
                 this.experimentData.finalScore = Math.round(
-                    (formalTrials.filter(t => t.correct).length / formalTrials.length) * 100
+                    (correctTrials.length / formalTrials.length) * 100
                 );
+                
+                // 计算正确试次平均反应时（只统计正确且反应时>100ms的试次）
+                const validCorrectTrials = correctTrials.filter(t => t.reactionTime > 100);
+                this.experimentData.avgCorrectRT = validCorrectTrials.length > 0 
+                    ? Math.round(validCorrectTrials.reduce((sum, t) => sum + t.reactionTime, 0) / validCorrectTrials.length)
+                    : 0;
             }
 
             formatResults() {
@@ -799,11 +985,8 @@
                 
                 // 3. 汇总数据
                 result += '汇总数据表\n';
-                result += '最终得分,总用时(秒),总试次数,正确试次数,平均反应时间(ms)\n';
-                const totalTime = Math.round((Date.now() - this.experimentData.startTime) / 1000);
-                const correctTrials = this.experimentData.trials.filter(t => t.correct).length;
-                const avgRT = Math.round(this.experimentData.trials.reduce((sum, t) => sum + t.reactionTime, 0) / this.experimentData.trials.length);
-                result += `${this.experimentData.finalScore},${totalTime},${this.experimentData.trials.length},${correctTrials},${avgRT}\n`;
+                result += '总试次数,正确试次数,正确率,平均反应时(ms)\n';
+                result += `${formalTrials.length},${correctTrials.length},${this.experimentData.finalScore}%,${this.experimentData.avgCorrectRT}\n`;
                 
                 return result;
             }
@@ -884,13 +1067,12 @@
                     
                     // 3. 汇总数据 - 只统计正式实验数据
                     const formalTrials = this.experimentData.trials.filter(t => t.phase === 'formal');
+                    const correctTrials = formalTrials.filter(t => t.correct);
                     const summaryData = [{
-                        最终得分: this.experimentData.finalScore,
-                        总用时: Math.round((Date.now() - this.experimentData.startTime) / 1000),
                         总试次数: formalTrials.length,
-                        正确试次数: formalTrials.filter(t => t.correct).length,
-                        平均反应时间: Math.round(formalTrials.reduce((sum, t) => 
-                            sum + t.reactionTime, 0) / formalTrials.length)
+                        正确试次数: correctTrials.length,
+                        正确率: this.experimentData.finalScore + '%',
+                        平均反应时: this.experimentData.avgCorrectRT + 'ms'
                     }];
                     const wsSummary = XLSX.utils.json_to_sheet(summaryData);
                     XLSX.utils.book_append_sheet(wb, wsSummary, "汇总数据");
@@ -915,6 +1097,161 @@
         // 公共函数
         function startPractice() {
             window.experiment.startPractice();
+        }
+
+        // 添加轮播功能
+        let currentSlide = 1;
+        const totalSlides = 4;
+
+        function changeSlide(slideNumber) {
+            slideNumber = Math.max(1, Math.min(slideNumber, totalSlides));
+            
+            // 隐藏所有幻灯片
+            document.querySelectorAll('.instruction-slide').forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.display = 'none';
+            });
+            
+            // 显示当前幻灯片
+            const currentSlideElement = document.querySelector(`.instruction-slide[data-slide="${slideNumber}"]`);
+            currentSlideElement.classList.add('active');
+            currentSlideElement.style.display = 'block';
+            
+            // 更新导航点
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === slideNumber - 1);
+            });
+            
+            currentSlide = slideNumber;
+            
+            // 处理开始按钮
+            const startButton = document.querySelector('.start-button');
+            startButton.style.display = slideNumber === totalSlides ? 'block' : 'none';
+        }
+
+        // 修改tryNextSlide和tryNextSlideByDirection函数
+        function tryNextSlide(inputKey) {
+            const currentSlideElement = document.querySelector(`.instruction-slide[data-slide="${currentSlide}"]`);
+            const correctKey = currentSlideElement.getAttribute('data-correct-key');
+            
+            if (inputKey === correctKey) {
+                if (currentSlide < totalSlides) {
+                    changeSlide(currentSlide + 1);
+                } else if (currentSlide === totalSlides) {
+                    // 如果是最后一页且按键正确，直接开始练习
+                    startPractice();
+                }
+            } else {
+                alert('请按照图片中小鱼的方向做出正确的选择！');
+            }
+        }
+
+        // 修改为检查正确方向后才能前进
+        function tryNextSlideByDirection(direction) {
+            const currentSlideElement = document.querySelector(`.instruction-slide[data-slide="${currentSlide}"]`);
+            const correctDir = currentSlideElement.getAttribute('data-correct-dir');
+            
+            if (direction === correctDir) {
+                if (currentSlide < totalSlides) {
+                    changeSlide(currentSlide + 1);
+                } else if (currentSlide === totalSlides) {
+                    // 如果是最后一页且方向正确，直接开始练习
+                    startPractice();
+                }
+            } else {
+                alert('请按照图片中小鱼的方向做出正确的选择！');
+            }
+        }
+
+        // 初始化指导页面的按键和按钮事件
+        document.addEventListener('DOMContentLoaded', () => {
+            // 键盘事件
+            document.addEventListener('keydown', (event) => {
+                if (document.getElementById('instructionScreen').style.display !== 'none') {
+                    if (event.key.toLowerCase() === 'a') {
+                        tryNextSlide('a');
+                    } else if (event.key.toLowerCase() === 'l') {
+                        tryNextSlide('l');
+                    }
+                }
+            });
+            
+            // 按钮点击事件
+            document.getElementById('instruction-left-btn').addEventListener('click', () => {
+                tryNextSlideByDirection('left');
+            });
+            
+            document.getElementById('instruction-right-btn').addEventListener('click', () => {
+                tryNextSlideByDirection('right');
+            });
+            
+            // 移除原有的点击事件
+            document.querySelectorAll('.dot').forEach(dot => {
+                const originalOnclick = dot.getAttribute('onclick');
+                if (originalOnclick) {
+                    dot.removeAttribute('onclick');
+                    dot.addEventListener('click', () => {
+                        // 点击圆点只允许回到之前的页面，不能跳过
+                        const slideNum = parseInt(dot.getAttribute('data-slide'));
+                        if (slideNum < currentSlide) {
+                            changeSlide(slideNum);
+                        }
+                    });
+                }
+            });
+        });
+
+        function startActualExperiment() {
+            // 隐藏正式实验前说明，开始实际实验
+            document.getElementById('formalIntroScreen').style.display = 'none';
+            document.getElementById('instructionScreen').style.display = 'none';
+            document.getElementById('experimentScreen').style.display = 'block';
+            
+            // 确保正确设置状态
+            window.experiment.state.phase = 'formal';
+            window.experiment.state.currentTrial = 0;
+            
+            // 直接运行试次
+            window.experiment.runTrial();
+        }
+
+        // 添加全局函数
+        function startActualPractice() {
+            window.experiment.startActualPractice();
+        }
+
+        // 在脚本部分添加返回函数
+        function returnToInstructions() {
+            // 隐藏练习说明界面
+            document.getElementById('practiceIntroScreen').style.display = 'none';
+            
+            // 显示指导语轮播界面
+            document.getElementById('instructionScreen').style.display = 'block';
+            
+            // 重置所有轮播元素状态
+            document.querySelectorAll('.instruction-slide').forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.display = 'none';
+            });
+            
+            // 强制激活第一页
+            const firstSlide = document.querySelector('.instruction-slide[data-slide="1"]');
+            firstSlide.classList.add('active');
+            firstSlide.style.display = 'block';
+            
+            // 重置导航元素
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+                if(index === 0) dot.classList.add('active');
+            });
+            
+            // 重置控制变量
+            currentSlide = 1;
+            
+            // 显示必要元素
+            document.querySelector('.carousel-dots').style.display = 'flex';
+            document.querySelector('.button-container.instruction-buttons').style.display = 'flex';
+            document.querySelector('.start-button').style.display = 'none';
         }
     </script>
 </body>
